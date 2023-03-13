@@ -1,32 +1,31 @@
 <?php
-// Validate form inputs
-if (!empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['password']) && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    
-    // Save profile picture to server
-    $uploads_dir = 'uploads/';
-    $filename = uniqid() . '-' . $_FILES['profile_picture']['name'];
-    move_uploaded_file($_FILES['profile_picture']['tmp_name'], $uploads_dir . $filename);
-    
-    // Add current date and time to filename
-    $datetime = date('Y-m-d H:i:s');
-    $new_filename = $datetime . '_' . $filename;
-    rename($uploads_dir . $filename, $uploads_dir . $new_filename);
-    
-    // Save user data to CSV file
-    $data = array($name, $email, $new_filename);
-    $fp = fopen('users.csv', 'a');
-    fputcsv($fp, $data);
-    fclose($fp);
-    
-    // Start session and set cookie with user's name
-    session_start();
-    $_SESSION['name'] = $name;
-    setcookie('name', $name, time() + 3600, '/');
-    
-    header('Location: view-users.php');
+session_start();
+if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    if ( empty( $name ) || empty( $email ) || empty( $password ) ) {
+        die( "Error: All fields are required." );
+    }
+    if ( !filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
+        die( "Error: Invalid email format." );
+    }
+    if ( isset( $_FILES["profile_pic"] ) ) {
+        $target_dir = "uploads/";
+        $target_file = $target_dir . date( "YmdHis" ) . "_" . basename( $_FILES["profile_pic"]["name"] );
+        if ( move_uploaded_file( $_FILES["profile_pic"]["tmp_name"], $target_file ) ) {
+            $file = fopen( "users.csv", "a" );
+            fputcsv( $file, array( $name, $email, $target_file ) );
+            fclose( $file );
+            setcookie( "username", $name, time() + 86400 );
+            header( "Location: view-users.php" );
+            exit();
+        } else {
+            die( "Error: Failed to upload profile picture." );
+        }
+    } else {
+        die( "Error: Profile picture is required." );
+    }
 }
 ?>
 
@@ -43,16 +42,16 @@ if (!empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['password
             <div class="col-md-8">
                 <form action="index.php" method="POST" enctype="multipart/form-data">
                     <label for="name">Name:</label>
-                    <input type="text" id="name"class="form-control" name="name" required><br><br>
+                    <input type="text" id="name"class="form-control" name="name"placeholder="your name" required><br>
                     
                     <label for="email">Email:</label>
-                    <input type="email" id="email"class="form-control" name="email" required><br><br>
+                    <input type="email" id="email"class="form-control" name="email"placeholder="your email" required><br>
                     
                     <label for="password">Password:</label>
-                    <input type="password" id="password"class="form-control" name="password" required><br><br>
+                    <input type="password" id="password"class="form-control" name="password" placeholder="your password" required><br>
                     
-                    <label for="profile_picture">Profile Picture:</label>
-                    <input type="file" id="profile_picture"class="form-control" name="profile_picture" required><br><br>
+                    <label for="profile_pic">Profile Picture:</label>
+                    <input type="file" id="profile_pic"class="form-control" name="profile_pic" required><br>
                     
                     <input type="submit"class="form-control btn btn-success" value="Register">
                 </form>

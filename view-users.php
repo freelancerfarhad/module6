@@ -1,38 +1,49 @@
-
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+    <title>User Information</title>
+    <!-- Adding Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="row pt-5">
-            <div class="col-md-2"></div>
-            <div class="col-md-8">
-                <table class='table table-striped table-dark'>
+        <h2>User Information</h2>
+        <table class="table">
+            <thead>
                 <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>User-Photo <a class="btn btn-danger float-right"href="index.php">back</a></th>
-                    </tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Profile Picture </th>
+                </tr>
+            </thead>
+            <tbody>
                 <?php
-                    $file = fopen('users.csv', 'r');
-                    while (($data = fgetcsv($file)) !== false) { ?>
-                         <tr>
-                         <?Php  foreach ($data as $cell) { ?>
-                            <td><?php echo htmlspecialchars($cell);?></td>
-                      <?php  } ?>
-                        </tr>
-                     <?php  }  fclose($file); ?>
-                  
-                </table>
-            </div>
-            <div class="col-md-2"></div>
-        </div>
+                if (($handle = fopen("users.csv", "r")) !== FALSE) {
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        echo "<tr>";
+                        echo "<td>" . $data[0] . "</td>";
+                        echo "<td>" . $data[1] . "</td>";
+                        echo "<td><img src='" . $data[2] . "' height='100'></td>";
+                        echo "</tr>";
+                    }
+                    fclose($handle);
+                }
+                ?>
+            </tbody>
+        </table>
+        <?php
+        if(isset($_COOKIE["username"])) {
+            echo "<p>Welcome, " . $_COOKIE["username"] . "!</p>";
+        }
+        ?><a href="index.php"class="btn btn-danger float-right">back</a>
     </div>
+    <!-- Adding Bootstrap JS -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 </body>
 </html>
