@@ -17,7 +17,7 @@
                 <tr>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>User-Photo</th>
+                        <th>User-Photo <a class="btn btn-danger float-right"href="index.php">back</a></th>
                     </tr>
                 <?php
                     $file = fopen('users.csv', 'r');

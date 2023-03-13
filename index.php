@@ -26,7 +26,7 @@ if (!empty($_POST['name']) && !empty($_POST['email']) && !empty($_POST['password
     $_SESSION['name'] = $name;
     setcookie('name', $name, time() + 3600, '/');
     
-    header('Location: success.html');
+    header('Location: view-users.php');
 }
 ?>
 
